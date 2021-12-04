@@ -1,4 +1,3 @@
-from coins.coin_info.validation import validation
 from coins.sequence_info.sequences import number_to_sequence
 from scipy.stats import linregress
 
@@ -12,34 +11,41 @@ def coin_2_likelihood(sequence):
     return (0.8 ** num_heads) * (0.2 ** num_tails)
 
 def coin_3_likelihood(sequence):
-    return 0.99 if validation(3, sequence) else 0.01
+    probability = 0.99 if sequence[0] == "H" else 0.01
+    for prev, next in zip(sequence, sequence[1:]):
+        probability *= 0.99 if prev != next else 0.01
+    return probability
 
 def coin_4_likelihood(sequence):
-    if validation(4, sequence):
-        probability = 1
-        for i in range(len(sequence)):
-            if i < 1:
-                flip_prob = 0.5
-            else:
-                flip_prob = 1 if sequence[i - 1] == "T" else 0.5
-            probability *= flip_prob
-        return 0.99 * probability
-    return 0.01
+    probability = 1
+    for prev, next in zip(sequence, sequence[1:]):
+        if prev == "T":
+            probability *= 0.99 if next == "H" else 0.01
+        else:
+            probability *= 0.5
+    return probability
 
 def coin_5_likelihood(sequence):
-    return 0.99 if validation(5, sequence) else 0.01
+    probability = 0.99 if sequence[0] == "H" and sequence[1] == "T" else 0.01
+    for prev_prev, prev, next in zip(sequence, sequence[1:], sequence[2:]):
+        if prev_prev == "H" and prev == "T":
+            probability *= 0.99 if next == "T" else 0.01
+        elif prev_prev == "T" and prev == "T":
+            probability *= 0.99 if next == "H" else 0.01
+        elif prev_prev == "T" and prev == "H":
+            probability *= 0.99 if next == "T" else 0.01
+        else:
+            probability *= 0.99 if next == "T" else 0.01
+    return probability
 
 def coin_6_likelihood(sequence):
-    if validation(6, sequence):
-        probability = 1
-        for i in range(len(sequence)):
-            if i < 2:
-                flip_prob = 0.5
-            else:
-                flip_prob = 1 if {sequence[i - 1], sequence[i-2]} == {"T"} else 0.5
-            probability *= flip_prob
-        return 0.99 * probability
-    return 0.01
+    probability = 0.25
+    for prev_prev, prev, next in zip(sequence, sequence[1:], sequence[2:]):
+        if prev_prev == "T" and prev == "T":
+            probability *= 0.99 if next == "H" else 0.01
+        else:
+            probability *= 0.5
+    return probability
 
 def likelihood(coin, sequence):
     """
