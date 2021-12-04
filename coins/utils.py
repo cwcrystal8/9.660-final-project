@@ -1,4 +1,4 @@
-from sequence_info.sequences import sequence_to_number
+from .sequence_info.sequences import sequence_to_number
 
 def raw_coin_to_number(raw_coin):
     return int(raw_coin.split(":")[0][-1])

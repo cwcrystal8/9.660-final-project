@@ -1,4 +1,4 @@
-from coin_info.validation import validation
+from coins.coin_info.validation import validation
 
 def coin_1_likelihood(sequence):
     return 1 / (2 ** len(sequence))
