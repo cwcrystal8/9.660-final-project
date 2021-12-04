@@ -1,4 +1,6 @@
 from coins.coin_info.validation import validation
+from coins.sequence_info.sequences import number_to_sequence
+from scipy.stats import linregress
 
 def coin_1_likelihood(sequence):
     return 1 / (2 ** len(sequence))
@@ -50,7 +52,31 @@ def likelihood(coin, sequence):
     mapping = {
         1: coin_1_likelihood,
         2: coin_2_likelihood,
-        3: coin_3_likelihood
+        3: coin_3_likelihood,
+        4: coin_4_likelihood,
+        5: coin_5_likelihood,
+        6: coin_6_likelihood
 
     }
     return mapping[coin](sequence)
+
+
+def test_likelihood(gamma, g_df, coins_to_ignore = []):
+    # Make each data point a row
+    data_df = g_df.stack().reset_index().rename(columns = {"level_1": "(c,s)", 0: "Rating"})
+    
+    # Calculate likelihood
+    data_df["Likelihood"] = data_df["(c,s)"].apply(lambda x: likelihood(x[0], number_to_sequence[x[1]]))
+    
+    # Get metadata for filtering
+    data_df["Coin"] = data_df["(c,s)"].apply(lambda x: x[0])
+    data_df["Sequence"] = data_df["(c,s)"].apply(lambda x: x[1])
+    
+    # Transform by power law
+    data_df["Rating"] = data_df["Rating"] ** gamma
+    
+    # Filter out coins to ignore
+    data_df = data_df[~(data_df["Coin"].isin(coins_to_ignore))]
+
+    # Return r-value
+    return linregress(data_df["Likelihood"], data_df["Rating"]).rvalue

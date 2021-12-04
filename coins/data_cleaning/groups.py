@@ -1,7 +1,7 @@
 import pandas as pd
 import plotly.express as px
 
-# from sequence_info.sequences import group_2_coins
+from ..sequence_info.sequences import group_2_coins
 from ..utils import google_form_question_to_coin_sequence
 
 DATA_FILENAME = "C:/Users/Crystal Wang/Downloads/9.660/9.660-final-project/data/data.csv"
@@ -106,7 +106,3 @@ def get_groups():
     g2_df = clean_group_2(g2_df)
     
     return g1_df, g2_df
-
-
-if __name__ == "__main__":
-    get_groups()
