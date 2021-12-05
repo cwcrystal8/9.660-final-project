@@ -1,5 +1,7 @@
-from coins.sequence_info.sequences import number_to_sequence
 from scipy.stats import linregress
+
+from coins.sequence_info.sequences import number_to_sequence
+
 
 def coin_1_likelihood(sequence):
     return 1 / (2 ** len(sequence))
@@ -67,13 +69,16 @@ def likelihood(coin, sequence):
     return mapping[coin](sequence)
 
 
-def test_likelihood(gamma, g_df, coins_to_ignore = []):
+def likelihood_model(gamma, g_df, coins_to_ignore = []):
     # Make each data point a row
     data_df = g_df.stack().reset_index().rename(columns = {"level_1": "(c,s)", 0: "Rating"})
     
     # Calculate likelihood
     data_df["Likelihood"] = data_df["(c,s)"].apply(lambda x: likelihood(x[0], number_to_sequence[x[1]]))
-    
+
+    # Map likelihood to the same interval
+    data_df["Likelihood"] = 1 + data_df["Likelihood"] * 6
+
     # Get metadata for filtering
     data_df["Coin"] = data_df["(c,s)"].apply(lambda x: x[0])
     data_df["Sequence"] = data_df["(c,s)"].apply(lambda x: x[1])
