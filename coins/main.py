@@ -1,29 +1,33 @@
+import pandas as pd
+
 from coins.data_cleaning.groups import get_groups
 from coins.models.fitting import fit_likelihood, fit_bayesian, fit_similarity
 
-def evaluate_models(df):
-    print("Likelihood model:")
-    gamma, r_value_l = fit_likelihood(df)
-    print(f"\tgamma = {gamma}")
-    print(f"\tr-value = {r_value_l}")
+def evaluate_models(df, coins_to_ignore = [], print_info = True):
+    
+    gamma, r_value_l = fit_likelihood(df, coins_to_ignore = coins_to_ignore)
+    if print_info:
+        print("Likelihood model:")
+        print(f"\tgamma = {gamma}")
+        print(f"\tr-value = {r_value_l}")
 
-    print()
+    
+    alpha, beta, gamma, r_value_b = fit_bayesian(df, coins_to_ignore = coins_to_ignore)
+    if print_info:
+        print()
+        print("Bayesian model:")
+        print(f"\talpha = {alpha}")
+        print(f"\tbeta = {beta}")
+        print(f"\tgamma = {gamma}")
+        print(f"\tr-value = {r_value_b}")  
 
-    print("Bayesian model:")
-    alpha, beta, gamma, r_value_b = fit_bayesian(df)
-    print(f"\talpha = {alpha}")
-    print(f"\tbeta = {beta}")
-    print(f"\tgamma = {gamma}")
-    print(f"\tr-value = {r_value_b}")  
-
-    print()
-
-    print("Similarity model:")
-    feature_weights, r_value_s = fit_similarity(df)
-    print(f"\tfeature weights = {feature_weights}")
-    print(f"\tr-value = {r_value_s}")
-
-    print()
+    
+    feature_weights, r_value_s = fit_similarity(df, coins_to_ignore = coins_to_ignore)
+    if print_info:
+        print()
+        print("Similarity model:")
+        print(f"\tfeature weights = {feature_weights}")
+        print(f"\tr-value = {r_value_s}")
 
     
     best_model = max([
@@ -31,7 +35,13 @@ def evaluate_models(df):
         (r_value_b, "Bayesian Model"),
         (r_value_s, "Similarity Model"),
     ])
-    print(f"Best Model: {best_model[1]}")
+    if print_info:
+        print()
+        print(f"Best Model: {best_model[1]}")
+
+    return best_model[0]
+
+
 
 def main():
     g1_df, g2_df = get_groups()
@@ -43,6 +53,23 @@ def main():
 
     print("---- GROUP 2 ANALYSIS ----")
     evaluate_models(g2_df)
+
+    print("\n")
+
+    print("---- ALL DATA ANALYSIS ----")
+    df = pd.concat([g1_df, g2_df])
+    df.columns = list(df.columns)
+    evaluate_models(df)
+
+    print("\n---------------------------------------\n")
+
+    r_value_comp_1 = evaluate_models(df, coins_to_ignore = [3,4,5,6], print_info = False)
+    r_value_comp_2 = evaluate_models(df, coins_to_ignore = [1,2,5,6], print_info = False)
+    r_value_comp_3 = evaluate_models(df, coins_to_ignore = [1,2,3,4], print_info = False)
+
+    print(f"\tComplexity 1: r-value = {r_value_comp_1}")
+    print(f"\tComplexity 2: r-value = {r_value_comp_2}")
+    print(f"\tComplexity 3: r-value = {r_value_comp_3}")
 
 if __name__ == "__main__":
     import warnings
