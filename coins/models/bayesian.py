@@ -23,6 +23,9 @@ def bayesian_model(alpha, beta, gamma, g_df, coins_to_ignore = []):
     # Calculate bayesian
     data_df["Bayesian"] = data_df["(c,s)"].apply(lambda x: bayesian(x[0], number_to_sequence[x[1]]))
 
+    # Transform by power law
+    data_df["Rating"] = data_df["Rating"] ** gamma
+
     # Map bayesian
     data_df["Bayesian"] = -alpha * data_df["Bayesian"] + beta
     data_df["Bayesian"] = 1 / (1 + e ** data_df["Bayesian"])
@@ -31,9 +34,6 @@ def bayesian_model(alpha, beta, gamma, g_df, coins_to_ignore = []):
     # Get metadata for filtering
     data_df["Coin"] = data_df["(c,s)"].apply(lambda x: x[0])
     data_df["Sequence"] = data_df["(c,s)"].apply(lambda x: x[1])
-    
-    # Transform by power law
-    data_df["Rating"] = data_df["Rating"] ** gamma
     
     # Filter out coins to ignore
     data_df = data_df[~(data_df["Coin"].isin(coins_to_ignore))]

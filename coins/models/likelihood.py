@@ -76,15 +76,15 @@ def likelihood_model(gamma, g_df, coins_to_ignore = []):
     # Calculate likelihood
     data_df["Likelihood"] = data_df["(c,s)"].apply(lambda x: likelihood(x[0], number_to_sequence[x[1]]))
 
+    # Transform by power law
+    data_df["Rating"] = data_df["Rating"] ** gamma
+
     # Map likelihood to the same interval
     data_df["Likelihood"] = 1 + data_df["Likelihood"] * 6
 
     # Get metadata for filtering
     data_df["Coin"] = data_df["(c,s)"].apply(lambda x: x[0])
     data_df["Sequence"] = data_df["(c,s)"].apply(lambda x: x[1])
-    
-    # Transform by power law
-    data_df["Rating"] = data_df["Rating"] ** gamma
     
     # Filter out coins to ignore
     data_df = data_df[~(data_df["Coin"].isin(coins_to_ignore))]
