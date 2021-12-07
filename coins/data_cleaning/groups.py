@@ -55,10 +55,10 @@ def significance_t_test(df1, df2):
     
     numerator = df1_means - df2_means
     denominator = (df1_vars + df2_vars) ** 0.5
-    
+
     return numerator / denominator > 1.96
     
-def verify_significance(g1_df, g2_df, plot = False):
+def verify_control_significance(g1_df, g2_df, plot = False):
     g1_control_df = get_control_data(g1_df)
     g2_control_df = get_control_data(g2_df)
 
@@ -70,7 +70,9 @@ def verify_significance(g1_df, g2_df, plot = False):
     is_significant = significance_t_test(g1_control_df, g2_control_df)
     
     if is_significant.any():
-        raise Exception("There is a significant difference between the two groups!")
+        raise Exception("The samples are significantly different in control responses!")
+    else:
+        print("No significant difference between the control responses.\n")
 
     return
 
@@ -79,8 +81,13 @@ def remove_control_data(g_df):
     return g_df.drop(g_df.columns[:5], axis = 1).astype(int)
 
 
+def sort_columns(df):
+    return df.reindex(sorted(df.columns), axis=1)
+
+
 def clean_group_1(g1_df):
     g1_df.columns = [google_form_question_to_coin_sequence(column) for column in g1_df.columns]
+    g1_df = sort_columns(g1_df)
     return g1_df
 
 
@@ -89,20 +96,34 @@ def clean_group_2(g2_df):
         google_form_question_to_coin_sequence(f"{column} [Coin {coin}: ]") 
         for column, coin in zip(g2_df.columns, group_2_coins)
     ]
-
+    g2_df = sort_columns(g2_df)
     return g2_df
+
+
+def test_experiment_significance(g1_df, g2_df):
+    print("---- GROUP 1 vs. GROUP 2 EXPERIMENT ----")
+    is_significant = significance_t_test(g1_df, g2_df)
+
+    if is_significant.any():
+        significant_cols = list((is_significant.loc[is_significant]).index)
+        print(f"There is a significant difference between group 1 and group 2: {significant_cols}\n")
+
+    else:
+        print("There is NO significant difference between group 1 and group 2\n")
 
 
 def get_groups():
     df = get_df()
     g1_df, g2_df = split_groups(df)
     
-    verify_significance(g1_df, g2_df)
+    verify_control_significance(g1_df, g2_df)
     
     g1_df = remove_control_data(g1_df)
     g2_df = remove_control_data(g2_df)
     
     g1_df = clean_group_1(g1_df)
     g2_df = clean_group_2(g2_df)
+
+    test_experiment_significance(g1_df, g2_df)
     
     return g1_df, g2_df

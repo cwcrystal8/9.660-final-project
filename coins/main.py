@@ -64,11 +64,12 @@ def main():
     print("\n---------------------------------------\n")
 
     r_value_comp_1 = evaluate_models(df, coins_to_ignore = [3,4,5,6], print_info = False)
-    r_value_comp_2 = evaluate_models(df, coins_to_ignore = [1,2,5,6], print_info = False)
-    r_value_comp_3 = evaluate_models(df, coins_to_ignore = [1,2,3,4], print_info = False)
-
     print(f"\tComplexity 1: r-value = {r_value_comp_1}")
+
+    r_value_comp_2 = evaluate_models(df, coins_to_ignore = [1,2,5,6], print_info = False)
     print(f"\tComplexity 2: r-value = {r_value_comp_2}")
+
+    r_value_comp_3 = evaluate_models(df, coins_to_ignore = [1,2,3,4], print_info = False)
     print(f"\tComplexity 3: r-value = {r_value_comp_3}")
 
 if __name__ == "__main__":
