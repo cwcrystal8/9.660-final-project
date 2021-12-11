@@ -56,7 +56,7 @@ def significance_t_test(df1, df2):
     numerator = df1_means - df2_means
     denominator = (df1_vars + df2_vars) ** 0.5
 
-    return numerator / denominator > 1.96
+    return (numerator / denominator).abs() > 1.96
     
 def verify_control_significance(g1_df, g2_df, plot = False):
     g1_control_df = get_control_data(g1_df)

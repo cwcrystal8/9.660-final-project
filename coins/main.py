@@ -57,20 +57,27 @@ def main():
     print("\n")
 
     print("---- ALL DATA ANALYSIS ----")
-    df = pd.concat([g1_df, g2_df])
-    df.columns = list(df.columns)
-    evaluate_models(df)
+    all_df = pd.concat([g1_df, g2_df])
+    all_df.columns = list(all_df.columns)
+    evaluate_models(all_df)
 
     print("\n---------------------------------------\n")
+    print("\n--------------COMPLEXITY---------------\n")
+    print("\n---------------------------------------\n")
 
-    r_value_comp_1 = evaluate_models(df, coins_to_ignore = [3,4,5,6], print_info = False)
-    print(f"\tComplexity 1: r-value = {r_value_comp_1}")
+    for name, df in {"Group 1": g1_df, "Group 2": g2_df, "Both Groups": all_df}.items():
+        print(f"---- {name} ----")
 
-    r_value_comp_2 = evaluate_models(df, coins_to_ignore = [1,2,5,6], print_info = False)
-    print(f"\tComplexity 2: r-value = {r_value_comp_2}")
+        r_value_comp_1 = evaluate_models(df, coins_to_ignore = [3,4,5,6], print_info = False)
+        print(f"\tComplexity 1: r-value = {r_value_comp_1}")
 
-    r_value_comp_3 = evaluate_models(df, coins_to_ignore = [1,2,3,4], print_info = False)
-    print(f"\tComplexity 3: r-value = {r_value_comp_3}")
+        r_value_comp_2 = evaluate_models(df, coins_to_ignore = [1,2,5,6], print_info = False)
+        print(f"\tComplexity 2: r-value = {r_value_comp_2}")
+
+        r_value_comp_3 = evaluate_models(df, coins_to_ignore = [1,2,3,4], print_info = False)
+        print(f"\tComplexity 3: r-value = {r_value_comp_3}")
+        
+        print()
 
 if __name__ == "__main__":
     import warnings
