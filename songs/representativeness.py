@@ -54,9 +54,9 @@ def calculate_representativeness_sum_sim(song_pairs_to_similarity, sample_songs,
             total += song_pairs_to_similarity[frozenset((song_j, song_i))]
     return total
 
-def calculate_songs_to_mds_coords(songs_to_song_vectors):
+def calculate_songs_to_mds_coords(songs_to_song_vectors, random_state = None):
     # we choose a 2D feature space as in the paper
-    embedding = MDS(n_components=2)
+    embedding = MDS(n_components=2, random_state=random_state)
     features = []
     labels = []
     for song in songs_to_song_vectors:
