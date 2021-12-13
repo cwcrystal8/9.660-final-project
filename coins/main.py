@@ -39,47 +39,51 @@ def evaluate_models(df, coins_to_ignore = [], print_info = True):
         print()
         print(f"Best Model: {best_model[1]}")
 
-    return best_model[0]
+    return best_model
 
 
 
-def main():
+def main(groups = True, complexity = True, print_info = True):
     g1_df, g2_df = get_groups()
-
-    print("---- GROUP 1 ANALYSIS ----")
-    evaluate_models(g1_df)
-
-    print("\n")
-
-    print("---- GROUP 2 ANALYSIS ----")
-    evaluate_models(g2_df)
-
-    print("\n")
-
-    print("---- ALL DATA ANALYSIS ----")
     all_df = pd.concat([g1_df, g2_df])
     all_df.columns = list(all_df.columns)
-    evaluate_models(all_df)
 
-    print("\n---------------------------------------\n")
-    print("\n--------------COMPLEXITY---------------\n")
-    print("\n---------------------------------------\n")
+    if groups:
 
-    for name, df in {"Group 1": g1_df, "Group 2": g2_df, "Both Groups": all_df}.items():
-        print(f"---- {name} ----")
+        print("---- GROUP 1 ANALYSIS ----")
+        evaluate_models(g1_df)
 
-        r_value_comp_1 = evaluate_models(df, coins_to_ignore = [3,4,5,6], print_info = False)
-        print(f"\tComplexity 1: r-value = {r_value_comp_1}")
+        print("\n")
 
-        r_value_comp_2 = evaluate_models(df, coins_to_ignore = [1,2,5,6], print_info = False)
-        print(f"\tComplexity 2: r-value = {r_value_comp_2}")
+        print("---- GROUP 2 ANALYSIS ----")
+        evaluate_models(g2_df)
 
-        r_value_comp_3 = evaluate_models(df, coins_to_ignore = [1,2,3,4], print_info = False)
-        print(f"\tComplexity 3: r-value = {r_value_comp_3}")
+        print("\n")
+
+        print("---- ALL DATA ANALYSIS ----")
         
-        print()
+        evaluate_models(all_df)
+
+    if complexity:
+        print("\n---------------------------------------")
+        print("\n--------------COMPLEXITY---------------")
+        print("\n---------------------------------------")
+
+        for name, df in {"Group 1": g1_df, "Group 2": g2_df, "Both Groups": all_df}.items():
+            print(f"---- {name} ----")
+
+            # r_value_comp_1 = evaluate_models(df, coins_to_ignore = [3,4,5,6], print_info = print_info)
+            # print(f"\tComplexity 1: {r_value_comp_1}")
+
+            r_value_comp_2 = evaluate_models(df, coins_to_ignore = [1,2,5,6], print_info = print_info)
+            print(f"\tComplexity 2: {r_value_comp_2}")
+
+            # r_value_comp_3 = evaluate_models(df, coins_to_ignore = [1,2,3,4], print_info = print_info)
+            # print(f"\tComplexity 3: {r_value_comp_3}")
+            
+            print()
 
 if __name__ == "__main__":
     import warnings
     warnings.filterwarnings("ignore")
-    main()
+    main(groups=False, complexity=True, print_info = True)
