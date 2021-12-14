@@ -4,36 +4,54 @@ import numpy as np
 from matplotlib.patches import Ellipse
 
 
-def plot_mds(songs_to_mds_coords, genre_label, show=False):
+def plot_mds(songs_to_mds_coords, genre_label, ellipse_sets):
     for s in songs_to_mds_coords:
-        plt.scatter([songs_to_mds_coords[s][0]],[songs_to_mds_coords[s][1]],label=s)     
-    mds_coords = songs_to_mds_coords.values()   
-    confidence_ellipse(np.asarray([c[0] for c in mds_coords]), np.asarray([c[1] for c in mds_coords]), plt.gca(), 1, edgecolor='black', label='1 STD all Songs')
-    plt.legend(fontsize='xx-small')
+        x, y = songs_to_mds_coords[s][0],songs_to_mds_coords[s][1]
+        plt.scatter([x],[y])
+        plt.annotate(s, (x,y), fontsize='small', wrap=True)
+    colors = ['black', 'tab:red', 'tab:orange', 'tab:green']
+    for i, (group, label) in enumerate(ellipse_sets):   
+        xs = np.asarray([songs_to_mds_coords[song][0] for song in group])
+        ys = np.asarray([songs_to_mds_coords[song][1] for song in group])
+        confidence_ellipse(xs, ys, plt.gca(), 1, edgecolor=colors[i], label=label)
+    plt.legend(fontsize='small')
+    plt.xticks(plt.xticks()[0], [])
+    plt.yticks(plt.yticks()[0], [])
     plt.title("MDS Space for {} Songs".format(genre_label))
-    # if show:
-    #     plt.show()
     return songs_to_mds_coords
 
-def plot_scatter_comparisons(human_data, bayesian_data, likelihood_data, max_sim_data, sum_sim_data, genre_label):
-    fig, ax = plt.subplots(2, 2)
-    plot_scatter_and_regression(bayesian_data, human_data, ax[0][0], "Bayesian Model")
-    plot_scatter_and_regression(likelihood_data, human_data, ax[0][1], "Likelihood Model")
-    plot_scatter_and_regression(max_sim_data, human_data, ax[1][0], "Max Similarity Model")
-    plot_scatter_and_regression(sum_sim_data, human_data, ax[1][1], "Sum Similarity Model")
-    plt.suptitle("Model Strength Comparisons for {} Songs".format(genre_label))
-    # plt.show()
+def plot_scatter_comparisons(human_data, bayesian_data, likelihood_data, max_sim_data, sum_sim_data, genre_label, plot=False, verbose=True):
+    ax = [[None, None], [None, None]]
+    if plot:
+        fig, ax = plt.subplots(2, 2)
+        plt.suptitle("Model Strength Comparisons for {} Songs".format(genre_label))
+    models_to_r_values = {}
+    models_to_r_values["Bayesian Model"] = plot_scatter_and_regression(bayesian_data, human_data, ax[0][0], "Bayesian Model", plot, verbose)
+    models_to_r_values["Likelihood Model"] = plot_scatter_and_regression(likelihood_data, human_data, ax[0][1], "Likelihood Model", plot, verbose)
+    models_to_r_values["Max-Similarity Model"] = plot_scatter_and_regression(max_sim_data, human_data, ax[1][0], "Max-Similarity Model", plot, verbose)
+    models_to_r_values["Sum-Similarity Model"] = plot_scatter_and_regression(sum_sim_data, human_data, ax[1][1], "Sum-Similarity Model", plot, verbose)
+    if verbose:
+        best_model = max(models_to_r_values, key=lambda x: models_to_r_values[x])
+        print("Best Model for {}: {}, {:.4f}".format(genre_label, best_model, models_to_r_values[best_model]))
+    if plot:
+        pass
+        # plt.show()
+    return models_to_r_values
 
-def plot_scatter_and_regression(x, y, ax, xlabel):
-    ax.scatter(x, y)
+def plot_scatter_and_regression(x, y, ax, xlabel, plot, verbose):
     m, b = np.polyfit(x, y, 1)
     correlation_matrix = np.corrcoef(x, y)
     correlation_xy = correlation_matrix[0,1]
-    r_squared = correlation_xy**2
-    ax.plot(x, [m*x_val + b for x_val in x], label='R2: {:.4}'.format(r_squared), color='orange')
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel("Human Data")
-    ax.legend()
+    if verbose:
+        print("R Value for {}: {}".format(xlabel, correlation_xy))
+    if plot:
+        ax.scatter(x, y)
+        ax.plot(x, [m*x_val + b for x_val in x], label='r= {:.4}'.format(correlation_xy), color='orange')
+        ax.set_xticks([])
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel("Human Data")
+        ax.legend()
+    return correlation_xy
 
 def confidence_ellipse(x, y, ax, n_std=3.0, facecolor='none', **kwargs):
     """

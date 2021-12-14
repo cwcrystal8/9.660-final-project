@@ -4,8 +4,8 @@ import spotipy
 from scipy import spatial
 from spotipy.oauth2 import SpotifyClientCredentials
 
-CID = 'MYCID'
-SECRET = 'MYSECRET'
+CID = '980bf809dba046c7a9b9f00f826a0cf9'
+SECRET = '3546ae978da144a8ac982f847a355ab8'
 
 def create_song_vectors(audio_vector_keys, track_vector_keys, album_vector_keys, song_ids):
     client_credentials_manager = SpotifyClientCredentials(client_id=CID, client_secret=SECRET)
